@@ -1,0 +1,96 @@
+{% extends "vrp/base.html" %}
+
+
+{% block title %}VRP - Solution {% endblock %}
+{% block extrainport %}
+<!-- include leaflet css and javascript -->
+<link rel="stylesheet" crossorigin="" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js" crossorigin=""></script>
+<style type="text/css">
+    #map {
+        height: 500px;
+    }
+</style>
+{% endblock extrainport%}
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="row">
+                <p>Problem name: {{ problem_name }}</p>
+            </div>
+            
+            <div class="row">
+                <p>Number of vehicles: {{ n_veh }}</p>
+            </div>
+            
+            <!-- <div class="row">
+                <p>First solution strategy: {{ ffs }}</p>
+            </div>
+            
+            <div class="row">
+                <p>Local search metaheuristics: {{ lsm }}</p>
+            </div>
+             -->
+            <div class="row">
+                <p>Status: {{ status }}</p>
+            </div>
+            
+            {% for item in string_rez %}
+            <div class="row">
+                <p>{{ item }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div id="map"></div>
+            <p>{{ status }}</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var map = L.map('map').setView([12.972442, 77.580643], 12);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    all_data = {{ data }}    // data is variable sent by view (as context)!
+
+    console.log(all_data)
+
+    locations = [];
+    colors = ['red', 'blue', 'green', 'black', 'yellow'];
+
+    for (var j = 0; j < all_data.length; j++) {
+        locations = all_data[j];
+
+        var pointList = [];
+        for (var i = 0; i < locations.length; i++) {
+            pointList.push(new L.LatLng(locations[i][0], locations[i][1]));
+        }
+
+        var firstpolyline = new L.Polyline(pointList, {
+            color: getRandomColor(),
+            weight: 5,
+            opacity: 0.9,
+            smoothFactor: 1
+        });
+        firstpolyline.addTo(map);
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+</script>
+{% endblock content %}
